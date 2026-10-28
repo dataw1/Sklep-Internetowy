@@ -1,0 +1,72 @@
+﻿@model Sklep_Internetowy.Models.RejestracjaViewModel
+@{
+    ViewData["Title"] = "Rejestracja";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <h2 class="mb-3">Rejestracja nowego klienta</h2>
+        <form asp-action="Register" method="post">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Imie" class="form-label">Imię</label>
+                    <input asp-for="Imie" class="form-control" />
+                    <span asp-validation-for="Imie" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Nazwisko" class="form-label">Nazwisko</label>
+                    <input asp-for="Nazwisko" class="form-control" />
+                    <span asp-validation-for="Nazwisko" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">Email</label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Haslo" class="form-label">Hasło</label>
+                <input asp-for="Haslo" class="form-control" />
+                <span asp-validation-for="Haslo" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Telefon" class="form-label">Telefon</label>
+                <input asp-for="Telefon" class="form-control" />
+                <span asp-validation-for="Telefon" class="text-danger"></span>
+            </div>
+            <hr />
+            <h5>Adres dostawy</h5>
+            <div class="row">
+                <div class="col-md-8 mb-3">
+                    <label asp-for="Ulica" class="form-label">Ulica</label>
+                    <input asp-for="Ulica" class="form-control" />
+                    <span asp-validation-for="Ulica" class="text-danger"></span>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label asp-for="NumerDomu" class="form-label">Nr domu/lokalu</label>
+                    <input asp-for="NumerDomu" class="form-control" />
+                    <span asp-validation-for="NumerDomu" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label asp-for="KodPocztowy" class="form-label">Kod pocztowy</label>
+                    <input asp-for="KodPocztowy" placeholder="00-000" class="form-control" />
+                    <span asp-validation-for="KodPocztowy" class="text-danger"></span>
+                </div>
+                <div class="col-md-8 mb-3">
+                    <label asp-for="Miasto" class="form-label">Miasto</label>
+                    <input asp-for="Miasto" class="form-control" />
+                    <span asp-validation-for="Miasto" class="text-danger"></span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success w-100">Zarejestruj konto</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

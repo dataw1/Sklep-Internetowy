@@ -1,0 +1,30 @@
+﻿@model Sklep_Internetowy.Models.LogowanieViewModel
+@{
+    ViewData["Title"] = "Logowanie";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-5">
+        <h2 class="mb-3">Logowanie do sklepu</h2>
+        <form asp-action="Login" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">Adres Email</label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Haslo" class="form-label">Hasło</label>
+                <input asp-for="Haslo" class="form-control" />
+                <span asp-validation-for="Haslo" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Zaloguj się</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
