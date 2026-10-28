@@ -1,0 +1,50 @@
+﻿@{
+    ViewData["Title"] = "Zamówienie złożone";
+}
+
+<div class="row justify-content-center py-5">
+    <div class="col-md-7 col-lg-6">
+        <div class="card border-0 shadow-sm text-center p-4 p-md-5">
+            <div class="card-body">
+
+                <div class="mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle" style="width: 90px; height: 90px;">
+                        <i class="bi bi-check-circle-fill" style="font-size: 3.5rem;"></i>
+                    </div>
+                </div>
+
+                <h2 class="fw-bold text-dark mb-2">Dziękujemy za zakupy!</h2>
+                <p class="text-muted fs-6 mb-4">
+                    Twoje zamówienie zostało pomyślnie przyjęte do realizacji. Na Twój adres email wysłaliśmy potwierdzenie wraz ze szczegółami.
+                </p>
+
+
+                <div class="bg-light rounded-3 p-3 p-md-4 text-start mb-4 border">
+                    <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                        <span class="text-muted">Numer zamówienia:</span>
+                        <span class="fw-bold font-monospace text-primary">@TempData["OrderNumber"]</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                        <span class="text-muted">Liczba zakupionych sztuk:</span>
+                        <span class="fw-bold">@TempData["OrderItemCount"] szt.</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                        <span class="text-muted">Metoda dostawy:</span>
+                        <span class="text-success fw-bold">Kurier (Darmowa)</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center pt-1">
+                        <span class="fs-6 fw-bold">Łącznie zapłacono:</span>
+                        <span class="fs-5 fw-bold text-success">@TempData["OrderTotal"]</span>
+                    </div>
+                </div>
+
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-primary px-4 py-2">
+                        <i class="bi bi-bag-plus me-2"></i>Kontynuuj zakupy
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
