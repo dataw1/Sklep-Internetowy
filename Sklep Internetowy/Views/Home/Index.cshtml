@@ -1,8 +1,44 @@
-﻿@{
-    ViewData["Title"] = "";
+﻿@model IEnumerable<Sklep_Internetowy.Models.Produkt>
+@{
+    ViewData["Title"] = "Oferta Produktów";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Witaj w naszym sklepie</h1>
-    <p>Strona jest w trakcie budowy.</p>
+<!-- Baner promocyjny -->
+<div class="p-5 mb-4 bg-primary text-white rounded-3 shadow-sm">
+    <div class="container-fluid py-2">
+        <h1 class="display-5 fw-bold">Odkryj najlepszy sprzęt komputerowy</h1>
+        <p class="col-md-8 fs-5">Sprawdź nasze najnowsze akcesoria w okazyjnych cenach. Zamów już dziś z darmową dostawą!</p>
+    </div>
+</div>
+
+<!-- Siatka produktów -->
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var item in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+                    <img src="@item.ZdjecieUrl" class="card-img-top" alt="@item.Nazwa" style="height: 180px; object-fit: cover;">
+                    <div class="card-body d-flex flex-column">
+                        <span class="badge bg-secondary w-auto align-self-start mb-2">@item.Kategoria</span>
+                        <h5 class="card-title fs-6 fw-bold">@item.Nazwa</h5>
+                        <p class="card-text text-muted small flex-grow-1">@item.Opis</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                            <span class="fs-5 fw-bold text-primary">@item.Cena.ToString("C")</span>
+                            <a asp-controller="Cart" asp-action="Index" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-cart-plus me-1"></i>Kup
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12 text-center py-5">
+            <h4 class="text-muted">Brak dostępnych produktów w bazie danych.</h4>
+        </div>
+    }
 </div>

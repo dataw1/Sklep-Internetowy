@@ -22,6 +22,85 @@ namespace Sklep_Internetowy.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Sklep_Internetowy.Models.Produkt", b =>
+                {
+                    b.Property<int>("IdProdukt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdProdukt"));
+
+                    b.Property<decimal>("Cena")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("IloscWMagazynie")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Kategoria")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nazwa")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Opis")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ZdjecieUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("IdProdukt");
+
+                    b.ToTable("Produkty");
+
+                    b.HasData(
+                        new
+                        {
+                            IdProdukt = 1,
+                            Cena = 299.99m,
+                            IloscWMagazynie = 15,
+                            Kategoria = "Akcesoria",
+                            Nazwa = "Klawiatura mechaniczna RGB",
+                            Opis = "Przełączniki Red, cicha praca, podświetlenie RGB, układ PL.",
+                            ZdjecieUrl = "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=500&auto=format&fit=crop&q=60"
+                        },
+                        new
+                        {
+                            IdProdukt = 2,
+                            Cena = 149.50m,
+                            IloscWMagazynie = 25,
+                            Kategoria = "Akcesoria",
+                            Nazwa = "Mysz bezprzewodowa Pro",
+                            Opis = "Sensor 16000 DPI, ergonomiczny kształt, do 70h na jednym ładowaniu.",
+                            ZdjecieUrl = "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500&auto=format&fit=crop&q=60"
+                        },
+                        new
+                        {
+                            IdProdukt = 3,
+                            Cena = 219.00m,
+                            IloscWMagazynie = 8,
+                            Kategoria = "Audio",
+                            Nazwa = "Słuchawki Gamingowe 7.1",
+                            Opis = "Dźwięk przestrzenny, mikrofon z redukcją szumów, miękkie nauszniki.",
+                            ZdjecieUrl = "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&auto=format&fit=crop&q=60"
+                        },
+                        new
+                        {
+                            IdProdukt = 4,
+                            Cena = 1099.00m,
+                            IloscWMagazynie = 5,
+                            Kategoria = "Monitory",
+                            Nazwa = "Monitor Gamingowy 27'' IPS",
+                            Opis = "Rozdzielczość 1440p, odświeżanie 165Hz, czas reakcji 1ms.",
+                            ZdjecieUrl = "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=500&auto=format&fit=crop&q=60"
+                        });
+                });
+
             modelBuilder.Entity("Sklep_Internetowy.Models.Uzytkownik", b =>
                 {
                     b.Property<int>("IdUzytkownik")

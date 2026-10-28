@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Sklep_Internetowy.Data;
 using Sklep_Internetowy.Models;
 using System.Diagnostics;
 
@@ -6,9 +8,17 @@ namespace Sklep_Internetowy.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly AppDbContext _context;
+
+        public HomeController(AppDbContext context)
         {
-            return View();
+            _context = context;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var produkty = await _context.Produkty.ToListAsync();
+            return View(produkty);
         }
 
         public IActionResult Privacy()
