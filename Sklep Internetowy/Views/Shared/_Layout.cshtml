@@ -63,6 +63,20 @@
                                 Rejestracja
                             </a>
                         }
+                        @if (User.IsInRole("Administrator"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-danger fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Panel Administratora
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="Produkty" asp-action="Index">Zarządzaj produktami</a></li>
+                                    <li><a class="dropdown-item" asp-controller="ZamowieniaAdmin" asp-action="Index">Zarządzaj zamówieniami</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" asp-controller="UzytkownicyAdmin" asp-action="Index">Zarządzaj klientami</a></li>
+                                </ul>
+                            </li>
+                        }
                     </div>
                 </div>
             </div>

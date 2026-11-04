@@ -9,20 +9,41 @@ namespace Sklep_Internetowy.Models
         public int IdProdukt { get; set; }
 
         [Required(ErrorMessage = "Nazwa produktu jest wymagana")]
-        [MaxLength(100)]
+        [Display(Name = "Nazwa produktu")]
         public string Nazwa { get; set; } = string.Empty;
 
-        [MaxLength(500)]
+        [Required(ErrorMessage = "Opis jest wymagany")]
+        [Display(Name = "Opis")]
         public string Opis { get; set; } = string.Empty;
 
-        [Required]
+        [Required(ErrorMessage = "Cena jest wymagana")]
         [Column(TypeName = "decimal(18,2)")]
+        [Display(Name = "Cena (zł)")]
         public decimal Cena { get; set; }
 
-        public string ZdjecieUrl { get; set; } = "https://placehold.co/400x300?text=Brak+Zdjecia";
+        public string ZdjecieUrl { get; set; } = "/images/default-product.png";
 
-        public string Kategoria { get; set; } = "Ogólne";
+        public string Kategoria { get; set; } = string.Empty;
 
-        public int IloscWMagazynie { get; set; } = 10;
+        [Required(ErrorMessage = "Ilość w magazynie jest wymagana")]
+        [Display(Name = "Ilość w magazynie (szt.)")]
+        public int IloscWMagazynie { get; set; }
+
+        // Właściwości ignorowane w bazie danych, ale potrzebne dla UML/Widoków
+        [NotMapped]
+        public decimal StawkaVat { get; set; } = 23m;
+
+        [NotMapped]
+        public bool CzyAktywny { get; set; } = true;
+
+        public decimal PobierzCeneBrutto()
+        {
+            return Math.Round(Cena * (1 + (StawkaVat / 100m)), 2);
+        }
+
+        public void AktualizujStan(int ilosc)
+        {
+            IloscWMagazynie += ilosc;
+        }
     }
 }

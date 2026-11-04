@@ -1,0 +1,90 @@
+﻿@using Sklep_Internetowy.Models
+@model IEnumerable<Sklep_Internetowy.Models.Zamowienie>
+@{
+    ViewData["Title"] = "Zarządzanie Zamówieniami";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3">Zarządzanie Zamówieniami Klientów</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-striped table-hover mb-0 align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nr Zamówienia</th>
+                        <th>Data złożenia</th>
+                        <th>Klient</th>
+                        <th>Adres dostawy</th>
+                        <th>Kwota</th>
+                        <th>Aktualny Status</th>
+                        <th style="width: 280px;">Zmień status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">Brak złożonych zamówień w systemie.</td>
+                        </tr>
+                    }
+                    @foreach (var zam in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold">#@zam.IdZamowienia</td>
+                            <td>@zam.DataZlozenia.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>
+                                @if (zam.Klient != null)
+                                {
+                                    <span>@zam.Klient.Imie @zam.Klient.Nazwisko</span><br />
+                                    <small class="text-muted">@zam.Klient.Email</small>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Konto usunięte</span>
+                                }
+                            </td>
+                            <td>
+                                @zam.AdresDostawyUlica<br />
+                                <small>@zam.AdresDostawyKod @zam.AdresDostawyMiasto</small>
+                            </td>
+                            <td class="fw-semibold">@zam.LacznyKoszt.ToString("0.00") zł</td>
+                            <td>
+                                @{
+                                    var badgeClass = zam.Status switch
+                                    {
+                                        StatusZamowienia.OCZEKUJACE => "bg-warning text-dark",
+                                        StatusZamowienia.OPLACONE => "bg-info text-dark",
+                                        StatusZamowienia.WYSYLANE => "bg-primary",
+                                        StatusZamowienia.ZREALIZOWANE => "bg-success",
+                                        StatusZamowienia.ANULOWANE => "bg-danger",
+                                        _ => "bg-secondary"
+                                    };
+                                }
+                                <span class="badge @badgeClass">@zam.Status</span>
+                            </td>
+                            <td>
+                                <form asp-action="ZmienStatusZamowienia" method="post" class="d-flex gap-2">
+                                    <input type="hidden" name="idZamowienia" value="@zam.IdZamowienia" />
+                                    <select name="status" class="form-select form-select-sm"
+                                            asp-for="@zam.Status"
+                                            asp-items="Html.GetEnumSelectList<StatusZamowienia>()">
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-primary">Zapisz</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

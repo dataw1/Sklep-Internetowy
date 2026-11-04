@@ -22,6 +22,27 @@ namespace Sklep_Internetowy.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Sklep_Internetowy.Models.Kategoria", b =>
+                {
+                    b.Property<int>("IdKategorii")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdKategorii"));
+
+                    b.Property<string>("Nazwa")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Opis")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("IdKategorii");
+
+                    b.ToTable("Kategorie");
+                });
+
             modelBuilder.Entity("Sklep_Internetowy.Models.Produkt", b =>
                 {
                     b.Property<int>("IdProdukt")
@@ -40,21 +61,24 @@ namespace Sklep_Internetowy.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("KategoriaIdKategorii")
+                        .HasColumnType("int");
+
                     b.Property<string>("Nazwa")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Opis")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ZdjecieUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("IdProdukt");
+
+                    b.HasIndex("KategoriaIdKategorii");
 
                     b.ToTable("Produkty");
 
@@ -109,6 +133,9 @@ namespace Sklep_Internetowy.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdUzytkownik"));
 
+                    b.Property<bool>("CzyAktywny")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("DataRejestracji")
                         .HasColumnType("datetime2");
 
@@ -146,6 +173,53 @@ namespace Sklep_Internetowy.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("Sklep_Internetowy.Models.Zamowienie", b =>
+                {
+                    b.Property<int>("IdZamowienia")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdZamowienia"));
+
+                    b.Property<string>("AdresDostawyKod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AdresDostawyMiasto")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AdresDostawyUlica")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DataZlozenia")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("KlientId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("LacznyKoszt")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("MetodaDostawy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MetodaPlatnosci")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("IdZamowienia");
+
+                    b.HasIndex("KlientId");
+
+                    b.ToTable("Zamowienia");
+                });
+
             modelBuilder.Entity("Sklep_Internetowy.Models.Administrator", b =>
                 {
                     b.HasBaseType("Sklep_Internetowy.Models.Uzytkownik");
@@ -178,6 +252,27 @@ namespace Sklep_Internetowy.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("Klient");
+                });
+
+            modelBuilder.Entity("Sklep_Internetowy.Models.Produkt", b =>
+                {
+                    b.HasOne("Sklep_Internetowy.Models.Kategoria", null)
+                        .WithMany("Produkty")
+                        .HasForeignKey("KategoriaIdKategorii");
+                });
+
+            modelBuilder.Entity("Sklep_Internetowy.Models.Zamowienie", b =>
+                {
+                    b.HasOne("Sklep_Internetowy.Models.Klient", "Klient")
+                        .WithMany()
+                        .HasForeignKey("KlientId");
+
+                    b.Navigation("Klient");
+                });
+
+            modelBuilder.Entity("Sklep_Internetowy.Models.Kategoria", b =>
+                {
+                    b.Navigation("Produkty");
                 });
 #pragma warning restore 612, 618
         }

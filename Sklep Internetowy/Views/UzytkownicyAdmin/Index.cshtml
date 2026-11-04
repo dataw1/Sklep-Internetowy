@@ -1,0 +1,108 @@
+﻿@model IEnumerable<Sklep_Internetowy.Models.Klient>
+@{
+    ViewData["Title"] = "Zarządzanie Klientami";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3">Zarejestrowani Klienci</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-striped table-hover mb-0 align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Imię i Nazwisko</th>
+                        <th>Email</th>
+                        <th>Telefon</th>
+                        <th>Adres zamieszkania</th>
+                        <th>Status konta</th>
+                        <th class="text-end">Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">Brak zarejestrowanych klientów.</td>
+                        </tr>
+                    }
+                    @foreach (var klient in Model)
+                    {
+                        <tr>
+                            <td>#@klient.IdUzytkownik</td>
+                            <td class="fw-bold">@klient.Imie @klient.Nazwisko</td>
+                            <td>@klient.Email</td>
+                            <td>@klient.Telefon</td>
+                            <td>ul. @klient.Ulica @klient.NumerDomu, @klient.KodPocztowy @klient.Miasto</td>
+                            <td>
+                                @if (klient.CzyAktywny)
+                                {
+                                    <span class="badge bg-success">Aktywne</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Zablokowane</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <!-- Przycisk zmiany statusu (Zablokuj / Odblokuj) -->
+                                <form asp-action="ZarzadzajUzytkownikiem" method="post" class="d-inline">
+                                    <input type="hidden" name="idUzytkownika" value="@klient.IdUzytkownik" />
+                                    @if (klient.CzyAktywny)
+                                    {
+                                        <input type="hidden" name="czyAktywny" value="false" />
+                                        <button type="submit" class="btn btn-sm btn-warning">Zablokuj</button>
+                                    }
+                                    else
+                                    {
+                                        <input type="hidden" name="czyAktywny" value="true" />
+                                        <button type="submit" class="btn btn-sm btn-success">Odblokuj</button>
+                                    }
+                                </form>
+
+                                <!-- Przycisk wywołujący modal usuwania -->
+                                <button type="button" class="btn btn-sm btn-danger ms-1"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteUserModal-@klient.IdUzytkownik">
+                                    Usuń
+                                </button>
+
+                                <!-- Modal potwierdzający usunięcie klienta -->
+                                <div class="modal fade text-start" id="deleteUserModal-@klient.IdUzytkownik" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Usuwanie konta klienta</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Czy na pewno chcesz trwale usunąć konto klienta <strong>@klient.Imie @klient.Nazwisko</strong> (@klient.Email)?</p>
+                                                <p class="text-muted small mb-0">Data rejestracji: @klient.DataRejestracji.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                                                <form asp-action="UsunKlienta" method="post" class="d-inline">
+                                                    <input type="hidden" name="idUzytkownika" value="@klient.IdUzytkownik" />
+                                                    <button type="submit" class="btn btn-danger">Potwierdź usunięcie</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

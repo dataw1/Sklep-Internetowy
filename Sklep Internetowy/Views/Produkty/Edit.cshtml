@@ -1,0 +1,76 @@
+﻿@model Sklep_Internetowy.Models.Produkt
+@{
+    ViewData["Title"] = "Edycja Produktu";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Edytuj produkt #@Model.IdProdukt</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="IdProdukt" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Nazwa" class="form-label fw-semibold"></label>
+                            <input asp-for="Nazwa" class="form-control" />
+                            <span asp-validation-for="Nazwa" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Opis" class="form-label fw-semibold"></label>
+                            <textarea asp-for="Opis" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Opis" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Cena" class="form-label fw-semibold"></label>
+                                <input asp-for="Cena" type="number" step="0.01" class="form-control" />
+                                <span asp-validation-for="Cena" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="StawkaVat" class="form-label fw-semibold"></label>
+                                <input asp-for="StawkaVat" type="number" step="1" class="form-control" />
+                                <span asp-validation-for="StawkaVat" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="IloscWMagazynie" class="form-label fw-semibold"></label>
+                                <input asp-for="IloscWMagazynie" type="number" class="form-control" />
+                                <span asp-validation-for="IloscWMagazynie" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ZdjecieUrl" class="form-label fw-semibold"></label>
+                            <input asp-for="ZdjecieUrl" class="form-control" />
+                            <span asp-validation-for="ZdjecieUrl" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input asp-for="CzyAktywny" class="form-check-input" />
+                            <label asp-for="CzyAktywny" class="form-check-label"></label>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Anuluj</a>
+                            <button type="submit" class="btn btn-primary px-4">Zapisz zmiany</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

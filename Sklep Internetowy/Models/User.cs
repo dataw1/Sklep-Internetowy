@@ -25,6 +25,7 @@ namespace Sklep_Internetowy.Models
         public string Telefon { get; set; } = string.Empty;
 
         public DateTime DataRejestracji { get; set; } = DateTime.UtcNow;
+        public bool CzyAktywny { get; set; } = true;
     }
 
     // Klasa Klient dziedzicząca po Uzytkownik (Generalizacja)

@@ -1,0 +1,117 @@
+﻿@model IEnumerable<Sklep_Internetowy.Models.Produkt>
+@{
+    ViewData["Title"] = "Zarządzanie Produktami";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Zarządzanie Katalogiem Produktów</h2>
+        <a asp-action="Create" class="btn btn-success">
+            + Dodaj nowy produkt
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-striped table-hover mb-0 align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nazwa</th>
+                        <th>Opis</th>
+                        <th>Cena Netto</th>
+                        <th>VAT</th>
+                        <th>Cena Brutto</th>
+                        <th>Stan mag.</th>
+                        <th>Status</th>
+                        <th class="text-end">Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center py-4 text-muted">Brak produktów w bazie danych.</td>
+                        </tr>
+                    }
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>#@item.IdProdukt</td>
+                            <td class="fw-bold">@item.Nazwa</td>
+                            <td class="text-truncate" style="max-width: 220px;">@item.Opis</td>
+                            <td>@item.Cena.ToString("0.00") zł</td>
+                            <td>@item.StawkaVat%</td>
+                            <td class="fw-semibold text-primary">@item.PobierzCeneBrutto().ToString("0.00") zł</td>
+                            <td>
+                                @if (item.IloscWMagazynie > 0)
+                                {
+                                    <span class="badge bg-info text-dark">@item.IloscWMagazynie szt.</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">Brak (0 szt.)</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.CzyAktywny)
+                                {
+                                    <span class="badge bg-success">Aktywny</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Wycofany</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="Edit" asp-route-id="@item.IdProdukt" class="btn btn-sm btn-primary me-1">
+                                    Edytuj
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal-@item.IdProdukt">
+                                    Usuń
+                                </button>
+
+                                <!-- Modal potwierdzający usunięcie -->
+                                <div class="modal fade text-start" id="deleteModal-@item.IdProdukt" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Potwierdzenie usunięcia</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Czy na pewno chcesz wycofać lub usunąć produkt <strong>@item.Nazwa</strong>?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                                                <form asp-action="Delete" method="post" class="d-inline">
+                                                    <input type="hidden" name="idProduktu" value="@item.IdProdukt" />
+                                                    <button type="submit" name="trwaleUsuniecie" value="false" class="btn btn-warning">
+                                                        Tylko ukryj (Nieaktywny)
+                                                    </button>
+                                                    <button type="submit" name="trwaleUsuniecie" value="true" class="btn btn-danger">
+                                                        Usuń trwale z bazy
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
