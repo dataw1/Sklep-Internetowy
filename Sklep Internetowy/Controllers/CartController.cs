@@ -21,12 +21,10 @@ namespace Sklep_Internetowy.Controllers
             return HttpContext.Session.GetObjectFromJson<List<CartItem>>(CartSessionKey) ?? new List<CartItem>();
         }
 
-
         private void SaveCart(List<CartItem> cart)
         {
             HttpContext.Session.SetObjectAsJson(CartSessionKey, cart);
         }
-
 
         public IActionResult Index()
         {
@@ -34,9 +32,13 @@ namespace Sklep_Internetowy.Controllers
             return View(cart);
         }
 
-
-        public async Task<IActionResult> AddToCart(int id)
+        public async Task<IActionResult> AddToCart(int id, int ilosc = 1)
         {
+            if (ilosc < 1)
+            {
+                ilosc = 1;
+            }
+
             var produkt = await _context.Produkty.FindAsync(id);
             if (produkt == null) return NotFound();
 
@@ -45,7 +47,7 @@ namespace Sklep_Internetowy.Controllers
 
             if (item != null)
             {
-                item.Ilosc++;
+                item.Ilosc += ilosc;
             }
             else
             {
@@ -54,7 +56,7 @@ namespace Sklep_Internetowy.Controllers
                     IdProdukt = produkt.IdProdukt,
                     Nazwa = produkt.Nazwa,
                     Cena = produkt.Cena,
-                    Ilosc = 1
+                    Ilosc = ilosc
                 });
             }
 
@@ -70,7 +72,6 @@ namespace Sklep_Internetowy.Controllers
             return RedirectToAction("Index");
         }
 
-
         public IActionResult Checkout()
         {
             var cart = GetCart();
@@ -80,23 +81,18 @@ namespace Sklep_Internetowy.Controllers
                 return RedirectToAction("Index");
             }
 
-
             if (User.Identity == null || !User.Identity.IsAuthenticated)
             {
                 TempData["AuthRequired"] = "Aby z³o¿yæ zamówienie i przejœæ do kasy, musisz najpierw za³o¿yæ konto lub siê zalogowaæ.";
                 return RedirectToAction("Register", "Account");
             }
 
-
             decimal total = cart.Sum(x => x.Suma);
             int itemCount = cart.Sum(x => x.Ilosc);
 
-
             string orderNumber = $"ORD-{DateTime.Now:yyyyMMdd}-{Random.Shared.Next(1000, 9999)}";
 
-
             HttpContext.Session.Remove(CartSessionKey);
-
 
             TempData["OrderNumber"] = orderNumber;
             TempData["OrderTotal"] = total.ToString("C");
@@ -104,7 +100,6 @@ namespace Sklep_Internetowy.Controllers
 
             return RedirectToAction("OrderSuccess");
         }
-
 
         public IActionResult OrderSuccess()
         {

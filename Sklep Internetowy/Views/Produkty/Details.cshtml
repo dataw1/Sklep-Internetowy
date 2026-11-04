@@ -1,0 +1,67 @@
+﻿@model Sklep_Internetowy.Models.Produkt
+
+@{
+    ViewData["Title"] = Model.Nazwa;
+}
+
+<div class="container my-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Strona główna</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Nazwa</li>
+        </ol>
+    </nav>
+
+    <div class="row mt-4">
+        <!-- Zdjęcie produktu -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm p-3">
+                <img src="@(string.IsNullOrEmpty(Model.ZdjecieUrl) ? "/images/placeholder.png" : Model.ZdjecieUrl)"
+                     class="img-fluid rounded mx-auto d-block"
+                     alt="@Model.Nazwa"
+                     style="max-height: 400px; object-fit: contain;">
+            </div>
+        </div>
+
+        <!-- Informacje o produkcie -->
+        <div class="col-md-6">
+            @if (!string.IsNullOrEmpty(Model.Kategoria))
+            {
+                <span class="badge bg-secondary mb-2">@Model.Kategoria</span>
+            }
+
+            <h2 class="fw-bold">@Model.Nazwa</h2>
+            <h3 class="text-primary fw-bold my-3">@Model.Cena.ToString("C")</h3>
+
+            <hr />
+
+            <p class="text-muted">
+                @(string.IsNullOrEmpty(Model.Opis) ? "Brak szczegółowego opisu dla tego produktu." : Model.Opis)
+            </p>
+
+            <form asp-controller="Cart" asp-action="AddToCart" method="post" class="mt-4">
+                <input type="hidden" name="id" value="@Model.IdProdukt" />
+
+                <div class="row g-3 align-items-center mb-3">
+                    <div class="col-auto">
+                        <label for="quantity" class="col-form-label fw-semibold">Ilość:</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="number" id="quantity" name="ilosc" class="form-control text-center" value="1" min="1" max="99" style="width: 80px;" />
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary px-4 py-2">
+                            🛒 Dodaj do koszyka
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="mt-3">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                    &larr; Wróć do przeglądania
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

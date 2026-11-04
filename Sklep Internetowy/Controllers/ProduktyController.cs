@@ -106,5 +106,27 @@ namespace Sklep_Internetowy.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
+
+        // GET: /Produkty/Details/1
+        [AllowAnonymous]
+
+        public async Task<IActionResult> Details(int? id)
+        { 
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var produkt = await _context.Produkty
+                .FirstOrDefaultAsync(m => m.IdProdukt == id);
+
+            if (produkt == null)
+            {
+                return NotFound();
+            }
+
+            return View(produkt);
+        }
+
     }
 }

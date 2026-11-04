@@ -19,11 +19,23 @@
         {
             <div class="col">
                 <div class="card h-100 shadow-sm border-0">
-                    <img src="@item.ZdjecieUrl" class="card-img-top" alt="@item.Nazwa" style="height: 180px; object-fit: cover;">
+                    <!-- Zdjęcie jako link do szczegółów -->
+                    <a asp-controller="Produkty" asp-action="Details" asp-route-id="@item.IdProdukt">
+                        <img src="@item.ZdjecieUrl" class="card-img-top" alt="@item.Nazwa" style="height: 180px; object-fit: cover;">
+                    </a>
+
                     <div class="card-body d-flex flex-column">
                         <span class="badge bg-secondary w-auto align-self-start mb-2">@item.Kategoria</span>
-                        <h5 class="card-title fs-6 fw-bold">@item.Nazwa</h5>
+
+                        <!-- Tytuł jako link do szczegółów -->
+                        <h5 class="card-title fs-6 fw-bold">
+                            <a asp-controller="Produkty" asp-action="Details" asp-route-id="@item.IdProdukt" class="text-decoration-none text-dark">
+                                @item.Nazwa
+                            </a>
+                        </h5>
+
                         <p class="card-text text-muted small flex-grow-1">@item.Opis</p>
+
                         <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
                             <span class="fs-5 fw-bold text-primary">@item.Cena.ToString("C")</span>
                             <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@item.IdProdukt" class="btn btn-sm btn-outline-success">
