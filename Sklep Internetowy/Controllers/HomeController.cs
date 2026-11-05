@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sklep_Internetowy.Data;
 using Sklep_Internetowy.Models;
-using System.Diagnostics;
 
 namespace Sklep_Internetowy.Controllers
 {
@@ -15,21 +14,45 @@ namespace Sklep_Internetowy.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? search, string? kategoria, string? sortOrder)
         {
-            var produkty = await _context.Produkty.ToListAsync();
+            ViewBag.Kategorie = await _context.Produkty
+                .Select(p => p.Kategoria)
+                .Where(k => !string.IsNullOrEmpty(k))
+                .Distinct()
+                .ToListAsync();
+
+            ViewBag.CurrentSearch = search;
+            ViewBag.CurrentCategory = kategoria;
+            ViewBag.CurrentSort = sortOrder;
+
+            var query = _context.Produkty.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(p => p.Nazwa.Contains(search) || (p.Opis != null && p.Opis.Contains(search)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(kategoria))
+            {
+                query = query.Where(p => p.Kategoria == kategoria);
+            }
+
+            query = sortOrder switch
+            {
+                "cena_rosnaco" => query.OrderBy(p => p.Cena),
+                "cena_malejaco" => query.OrderByDescending(p => p.Cena),
+                "nazwa_desc" => query.OrderByDescending(p => p.Nazwa),
+                _ => query.OrderBy(p => p.Nazwa) 
+            };
+
+            var produkty = await query.ToListAsync();
             return View(produkty);
         }
 
         public IActionResult Privacy()
         {
             return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

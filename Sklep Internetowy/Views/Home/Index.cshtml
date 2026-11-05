@@ -1,56 +1,117 @@
 ﻿@model IEnumerable<Sklep_Internetowy.Models.Produkt>
+
 @{
-    ViewData["Title"] = "Oferta Produktów";
+    ViewData["Title"] = "Strona Główna";
+    var kategorie = ViewBag.Kategorie as List<string> ?? new List<string>();
+    string currentSearch = ViewBag.CurrentSearch as string ?? "";
+    string currentCategory = ViewBag.CurrentCategory as string ?? "";
+    string currentSort = ViewBag.CurrentSort as string ?? "";
 }
 
-
-<div class="p-5 mb-4 bg-primary text-white rounded-3 shadow-sm">
-    <div class="container-fluid py-2">
-        <h1 class="display-5 fw-bold">Odkryj najlepszy sprzęt komputerowy</h1>
-        <p class="col-md-8 fs-5">Sprawdź nasze najnowsze akcesoria w okazyjnych cenach. Zamów już dziś z darmową dostawą!</p>
+<!-- Baner powitalny -->
+<div class="bg-primary text-white p-5 rounded-3 mb-4 shadow-sm">
+    <div class="container py-2">
+        <h1 class="display-6 fw-bold">Odkryj najlepszy sprzęt komputerowy</h1>
+        <p class="col-md-8 fs-6 mb-0">Sprawdź nasze najnowsze akcesoria w okazyjnych cenach. Zamów już dziś z darmową dostawą!</p>
     </div>
 </div>
 
+<div class="container mb-5">
+    <!-- Pasek Wyszukiwania i Filtrów -->
+    <div class="card border-0 shadow-sm p-3 mb-4 bg-light">
+        <form asp-controller="Home" asp-action="Index" method="get">
+            <div class="row g-2 align-items-center">
+                <!-- Pole wyszukiwania -->
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" name="search" class="form-control" placeholder="Szukaj produktu..." value="@currentSearch" />
+                    </div>
+                </div>
 
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                <!-- Filtr kategorii -->
+                <div class="col-md-3">
+                    <select name="kategoria" class="form-select">
+                        <option value="">Wszystkie kategorie</option>
+                        @foreach (var kat in kategorie)
+                        {
+                            if (kat == currentCategory)
+                            {
+                                <option value="@kat" selected>@kat</option>
+                            }
+                            else
+                            {
+                                <option value="@kat">@kat</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <!-- Sortowanie -->
+                <div class="col-md-3">
+                    <select name="sortOrder" class="form-select">
+                        <option value="">Sortuj: Domyślnie (A-Z)</option>
+                        <option value="cena_rosnaco" selected="@(currentSort == "cena_rosnaco")">Cena: od najniższej</option>
+                        <option value="cena_malejaco" selected="@(currentSort == "cena_malejaco")">Cena: od najwyższej</option>
+                        <option value="nazwa_desc" selected="@(currentSort == "nazwa_desc")">Nazwa: Z-A</option>
+                    </select>
+                </div>
+
+                <!-- Przyciski Filtruj i Wyczyść -->
+                <div class="col-md-2 d-flex gap-1">
+                    <button type="submit" class="btn btn-primary w-100">Szukaj</button>
+                    @if (!string.IsNullOrEmpty(currentSearch) || !string.IsNullOrEmpty(currentCategory) || !string.IsNullOrEmpty(currentSort))
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary" title="Wyczyść filtry">X</a>
+                    }
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista Produktów -->
     @if (Model != null && Model.Any())
     {
-        @foreach (var item in Model)
-        {
-            <div class="col">
-                <div class="card h-100 shadow-sm border-0">
-                    <!-- Zdjęcie jako link do szczegółów -->
-                    <a asp-controller="Produkty" asp-action="Details" asp-route-id="@item.IdProdukt">
-                        <img src="@item.ZdjecieUrl" class="card-img-top" alt="@item.Nazwa" style="height: 180px; object-fit: cover;">
-                    </a>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        <a asp-controller="Produkty" asp-action="Details" asp-route-id="@item.IdProdukt">
+                            <img src="@item.ZdjecieUrl" class="card-img-top" alt="@item.Nazwa" style="height: 180px; object-fit: cover;">
+                        </a>
+                        <div class="card-body d-flex flex-column">
+                            @if (!string.IsNullOrEmpty(item.Kategoria))
+                            {
+                                <span class="badge bg-secondary w-auto align-self-start mb-2">@item.Kategoria</span>
+                            }
 
-                    <div class="card-body d-flex flex-column">
-                        <span class="badge bg-secondary w-auto align-self-start mb-2">@item.Kategoria</span>
+                            <h5 class="card-title fs-6 fw-bold">
+                                <a asp-controller="Produkty" asp-action="Details" asp-route-id="@item.IdProdukt" class="text-decoration-none text-dark">
+                                    @item.Nazwa
+                                </a>
+                            </h5>
 
-                        <!-- Tytuł jako link do szczegółów -->
-                        <h5 class="card-title fs-6 fw-bold">
-                            <a asp-controller="Produkty" asp-action="Details" asp-route-id="@item.IdProdukt" class="text-decoration-none text-dark">
-                                @item.Nazwa
-                            </a>
-                        </h5>
+                            <p class="card-text text-muted small flex-grow-1">@item.Opis</p>
 
-                        <p class="card-text text-muted small flex-grow-1">@item.Opis</p>
-
-                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
-                            <span class="fs-5 fw-bold text-primary">@item.Cena.ToString("C")</span>
-                            <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@item.IdProdukt" class="btn btn-sm btn-outline-success">
-                                <i class="bi bi-cart-plus me-1"></i>Kup
-                            </a>
+                            <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                                <span class="fs-5 fw-bold text-primary">@item.Cena.ToString("C")</span>
+                                <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@item.IdProdukt" class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-cart-plus me-1"></i>Kup
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
     }
     else
     {
-        <div class="col-12 text-center py-5">
-            <h4 class="text-muted">Brak dostępnych produktów w bazie danych.</h4>
+        <div class="alert alert-info text-center py-5">
+            <h4>Nie znaleziono produktów</h4>
+            <p class="text-muted mb-3">Spróbuj zmienić parametry wyszukiwania lub zresetować filtry.</p>
+            <a asp-action="Index" class="btn btn-outline-primary btn-sm">Wyczyść filtry</a>
         </div>
     }
 </div>
