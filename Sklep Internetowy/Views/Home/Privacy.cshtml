@@ -1,6 +1,102 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Polityka prywatności";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="container my-5">
+    <!-- Nagłówek strony -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Strona główna</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Polityka prywatności</li>
+                </ol>
+            </nav>
+
+            <div class="card border-0 shadow-sm p-4 p-md-5">
+                <h1 class="fw-bold mb-3">Polityka prywatności</h1>
+                <p class="text-muted mb-4">Ostatnia aktualizacja: @DateTime.Now.ToString("dd.MM.yyyy") r.</p>
+
+                <hr class="mb-4" />
+
+                <!-- Sekcja 1 -->
+                <section class="mb-4">
+                    <h4 class="fw-semibold text-primary">1. Administrator Danych Osobowych</h4>
+                    <p class="text-secondary">
+                        Administratorem Twoich danych osobowych przetwarzanych w ramach serwisu <strong>Sklep Internetowy</strong> jest zespół projektowy realizujący niniejszą platformę e-commerce. W sprawach związanych z ochroną prywatności możesz skontaktować się z nami pod adresem e-mail: <code>kontakt@sklep-internetowy.pl</code>.
+                    </p>
+                </section>
+
+                <!-- Sekcja 2 -->
+                <section class="mb-4">
+                    <h4 class="fw-semibold text-primary">2. Jakie dane zbieramy i w jakim celu?</h4>
+                    <p class="text-secondary">Przetwarzamy dane niezbędne do prawidłowego funkcjonowania sklepu oraz realizacji usług:</p>
+                    <ul class="text-secondary">
+                        <li><strong>Rejestracja i logowanie:</strong> adres e-mail, nazwa użytkownika oraz zaszyfrowane hasło w celu utrzymania konta klienta.</li>
+                        <li><strong>Obsługa zamówień i koszyka:</strong> dane teleadresowe do wysyłki (imię, nazwisko, adres doręczenia, numer telefonu) oraz historia zakupów w celu realizacji i dostarczenia zamówień.</li>
+                        <li><strong>Pliki sesyjne:</strong> identyfikator sesji umożliwiający tymczasowe przechowywanie produktów w koszyku w trakcie przeglądania sklepu.</li>
+                    </ul>
+                </section>
+
+                <!-- Sekcja 3 -->
+                <section class="mb-4">
+                    <h4 class="fw-semibold text-primary">3. Podstawa prawna przetwarzania (RODO)</h4>
+                    <p class="text-secondary">
+                        Dane osobowe przetwarzane są zgodnie z Rozporządzeniem Parlamentu Europejskiego i Rady (UE) 2016/679 (RODO):
+                    </p>
+                    <ul class="text-secondary">
+                        <li><strong>Art. 6 ust. 1 lit. b RODO:</strong> niezbędność do wykonania umowy sprzedaży lub podjęcia działań przed jej zawarciem (rejestracja, złożenie zamówienia).</li>
+                        <li><strong>Art. 6 ust. 1 lit. c RODO:</strong> wypełnienie obowiązków prawnych ciążących na administratorze (np. wystawianie dokumentów księgowych).</li>
+                        <li><strong>Art. 6 ust. 1 lit. f RODO:</strong> prawnie uzasadniony interes administratora (np. obrona przed ewentualnymi roszczeniami, analityka bezpieczeństwa).</li>
+                    </ul>
+                </section>
+
+                <!-- Sekcja 4 -->
+                <section class="mb-4">
+                    <h4 class="fw-semibold text-primary">4. Odbiorcy danych</h4>
+                    <p class="text-secondary">Twoje dane mogą być przekazywane wyłącznie zaufanym podmiotom trzecim w minimalnym zakresie niezbędnym do realizacji zamówienia:</p>
+                    <ul class="text-secondary">
+                        <li>Operatorom logistycznym i firmom kurierskim (dostarczenie przesyłki pod wskazany adres).</li>
+                        <li>Operatorom bramek płatności elektronicznych (w przypadku płatności online).</li>
+                        <li>Dostawcom usług hostingowych i utrzymania bazy danych.</li>
+                    </ul>
+                </section>
+
+                <!-- Sekcja 5 -->
+                <section class="mb-4">
+                    <h4 class="fw-semibold text-primary">5. Twoje prawa</h4>
+                    <p class="text-secondary">Zgodnie z przepisami prawa przysługują Ci następujące uprawnienia:</p>
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <div class="border rounded p-2 text-secondary bg-light">✓ Prawo dostępu do treści swoich danych</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded p-2 text-secondary bg-light">✓ Prawo do sprostowania (poprawiania) danych</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded p-2 text-secondary bg-light">✓ Prawo do usunięcia danych („prawo do bycia zapomnianym”)</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded p-2 text-secondary bg-light">✓ Prawo do ograniczenia przetwarzania</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Sekcja 6 -->
+                <section class="mb-4">
+                    <h4 class="fw-semibold text-primary">6. Pliki Cookies (Ciasteczka)</h4>
+                    <p class="text-secondary">
+                        Nasz serwis wykorzystuje wyłącznie niezbędne pliki cookies oraz mechanizm sesji przeglądarki, które odpowiadają za utrzymanie stanu zalogowanego użytkownika oraz zawartość koszyka zakupowego. Możesz w każdej chwili zmienić ustawienia dotyczące cookies bezpośrednio w swojej przeglądarce internetowej.
+                    </p>
+                </section>
+
+                <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary btn-sm">
+                        &larr; Wróć do sklepu
+                    </a>
+                    <span class="text-muted small">Sklep Internetowy &copy; @DateTime.Now.Year</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

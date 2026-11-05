@@ -21,7 +21,7 @@ namespace Sklep_Internetowy.Controllers
         public async Task<IActionResult> Index()
         {
             var produkty = await _context.Produkty
-                .OrderByDescending(p => p.IdProdukt) // Zmieniono na IdProdukt
+                .OrderByDescending(p => p.IdProdukt) 
                 .ToListAsync();
             return View(produkty);
         }
@@ -65,7 +65,7 @@ namespace Sklep_Internetowy.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Produkt daneProduktu)
         {
-            if (id != daneProduktu.IdProdukt) // Zmieniono na IdProdukt
+            if (id != daneProduktu.IdProdukt) 
             {
                 return BadRequest();
             }
@@ -80,9 +80,9 @@ namespace Sklep_Internetowy.Controllers
 
                 produktWBazie.Nazwa = daneProduktu.Nazwa;
                 produktWBazie.Opis = daneProduktu.Opis;
-                produktWBazie.Cena = daneProduktu.Cena; // Zmieniono na Cena
-                produktWBazie.IloscWMagazynie = daneProduktu.IloscWMagazynie; // Zmieniono na IloscWMagazynie
-                produktWBazie.ZdjecieUrl = daneProduktu.ZdjecieUrl; // Zmieniono na ZdjecieUrl
+                produktWBazie.Cena = daneProduktu.Cena; 
+                produktWBazie.IloscWMagazynie = daneProduktu.IloscWMagazynie; 
+                produktWBazie.ZdjecieUrl = daneProduktu.ZdjecieUrl;
                 produktWBazie.Kategoria = daneProduktu.Kategoria;
 
                 await _context.SaveChangesAsync();
@@ -95,7 +95,7 @@ namespace Sklep_Internetowy.Controllers
         // POST: Produkty/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int idProduktu) // Parametr z widoku
+        public async Task<IActionResult> Delete(int idProduktu)
         {
             var produkt = await _context.Produkty.FindAsync(idProduktu);
             if (produkt != null)
