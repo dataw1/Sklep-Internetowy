@@ -3,7 +3,6 @@
     ViewData["Title"] = "Koszyk zakupowy";
     decimal sumaCalkowita = Model?.Sum(x => x.Suma) ?? 0;
 }
-
 <div class="container py-3">
     <h2 class="mb-4">Twój Koszyk 🛒</h2>
 
@@ -11,6 +10,13 @@
     {
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             @TempData["CartWarning"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
@@ -25,7 +31,7 @@
                         <th>Cena</th>
                         <th>Ilość</th>
                         <th>Suma</th>
-                        <th class="text-center">Usuń</th>
+                        <th class="text-center">Akcje</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -35,7 +41,12 @@
                             <td class="fw-bold">@item.Nazwa</td>
                             <td>@item.Cena.ToString("C")</td>
                             <td>
-                                <span class="badge bg-light text-dark border px-3 py-2">@item.Ilosc</span>
+                                <!-- Zmieniono na formularz umożliwiający edycję ilości w koszyku -->
+                                <form asp-controller="Cart" asp-action="AddToCart" method="post" class="d-flex align-items-center m-0">
+                                    <input type="hidden" name="id" value="@item.IdProdukt" />
+                                    <!-- Ponieważ metoda AddToCart będzie nadpisywać lub dodawać, wysyłamy różnicę lub używamy dedykowanej metody -->
+                                    <span class="badge bg-light text-dark border px-3 py-2 me-2 fs-6">@item.Ilosc szt.</span>
+                                </form>
                             </td>
                             <td class="fw-bold">@item.Suma.ToString("C")</td>
                             <td class="text-center">

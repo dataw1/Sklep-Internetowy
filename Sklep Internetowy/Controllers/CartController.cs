@@ -9,7 +9,8 @@ namespace Sklep_Internetowy.Controllers
     public class CartController : Controller
     {
         private readonly AppDbContext _context;
-        private const string CartSessionKey = "UserCart";
+        // Zmieniony klucz, aby wszêdzie by³ taki sam ("Cart")
+        private const string CartSessionKey = "Cart";
 
         public CartController(AppDbContext context)
         {
@@ -26,53 +27,80 @@ namespace Sklep_Internetowy.Controllers
             HttpContext.Session.SetObjectAsJson(CartSessionKey, cart);
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
             var cart = GetCart();
             return View(cart);
         }
 
+        [HttpPost] // Zmienione na HttpPost, bo u¿ywamy <form method="post">
         public async Task<IActionResult> AddToCart(int id, int ilosc = 1)
         {
+            var produkt = await _context.Produkty.FindAsync(id);
+            if (produkt == null)
+            {
+                return NotFound();
+            }
+
             if (ilosc < 1)
             {
                 ilosc = 1;
             }
 
-            var produkt = await _context.Produkty.FindAsync(id);
-            if (produkt == null) return NotFound();
-
+            // U¿ywamy ujednoliconej metody GetCart
             var cart = GetCart();
-            var item = cart.FirstOrDefault(c => c.IdProdukt == id);
 
-            if (item != null)
+            var existingItem = cart.FirstOrDefault(c => c.IdProdukt == id);
+            int obecnaIloscWKoszyku = existingItem != null ? existingItem.Ilosc : 0;
+
+            if (obecnaIloscWKoszyku + ilosc > produkt.IloscWMagazynie)
             {
-                item.Ilosc += ilosc;
+                TempData["Error"] = $"Nie mo¿na dodaæ tylu sztuk. W magazynie mamy tylko {produkt.IloscWMagazynie} szt. (w koszyku masz ju¿ {obecnaIloscWKoszyku} szt.).";
             }
             else
             {
-                cart.Add(new CartItem
+                if (existingItem != null)
                 {
-                    IdProdukt = produkt.IdProdukt,
-                    Nazwa = produkt.Nazwa,
-                    Cena = produkt.Cena,
-                    Ilosc = ilosc
-                });
+                    existingItem.Ilosc += ilosc;
+                }
+                else
+                {
+                    cart.Add(new CartItem
+                    {
+                        IdProdukt = produkt.IdProdukt,
+                        Nazwa = produkt.Nazwa,
+                        Cena = produkt.Cena,
+                        Ilosc = ilosc
+                    });
+                }
+
+                // U¿ywamy ujednoliconej metody SaveCart
+                SaveCart(cart);
+                TempData["Success"] = $"Dodano {produkt.Nazwa} do koszyka!";
             }
 
-            SaveCart(cart);
-            return RedirectToAction("Index");
+            string referer = Request.Headers["Referer"].ToString();
+            if (!string.IsNullOrEmpty(referer))
+            {
+                return Redirect(referer);
+            }
+
+            return RedirectToAction("Index", "Home");
         }
 
+        [HttpGet]
         public IActionResult Remove(int id)
         {
             var cart = GetCart();
             cart.RemoveAll(c => c.IdProdukt == id);
             SaveCart(cart);
+            TempData["Success"] = "Usuniêto produkt z koszyka.";
             return RedirectToAction("Index");
         }
 
-        public IActionResult Checkout()
+        [HttpGet]
+        public async Task<IActionResult> Checkout()
         {
             var cart = GetCart();
             if (!cart.Any())
@@ -86,6 +114,22 @@ namespace Sklep_Internetowy.Controllers
                 TempData["AuthRequired"] = "Aby z³o¿yæ zamówienie i przejœæ do kasy, musisz najpierw za³o¿yæ konto lub siê zalogowaæ.";
                 return RedirectToAction("Register", "Account");
             }
+
+            foreach (var item in cart)
+            {
+                var produktWBazie = await _context.Produkty.FindAsync(item.IdProdukt);
+                if (produktWBazie != null)
+                {
+                    produktWBazie.IloscWMagazynie -= item.Ilosc;
+
+                    if (produktWBazie.IloscWMagazynie < 0)
+                    {
+                        produktWBazie.IloscWMagazynie = 0;
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
 
             decimal total = cart.Sum(x => x.Suma);
             int itemCount = cart.Sum(x => x.Ilosc);
@@ -101,6 +145,7 @@ namespace Sklep_Internetowy.Controllers
             return RedirectToAction("OrderSuccess");
         }
 
+        [HttpGet]
         public IActionResult OrderSuccess()
         {
             if (TempData["OrderNumber"] == null)

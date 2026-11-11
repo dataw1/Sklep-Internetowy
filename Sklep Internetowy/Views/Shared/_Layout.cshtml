@@ -1,4 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@using Sklep_Internetowy.Extensions
+@using Sklep_Internetowy.Models
+@{
+
+    var koszyk = Context.Session.GetObjectFromJson<List<CartItem>>("Cart");
+    int iloscWKoszyku = koszyk != null ? koszyk.Sum(x => x.Ilosc) : 0;
+}
+<!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="utf-8" />
@@ -44,7 +51,15 @@
                         <a class="btn btn-outline-light d-flex align-items-center justify-content-center" asp-controller="Cart" asp-action="Index">
                             <i class="bi bi-cart3 me-1"></i>Koszyk
                         </a>
-
+                        <li class="nav-item">
+                            <a class="nav-link text-dark d-flex align-items-center" asp-area="" asp-controller="Cart" asp-action="Index">
+                                Koszyk
+                                @if (iloscWKoszyku > 0)
+                                {
+                                    <span class="badge rounded-pill bg-danger ms-1">@iloscWKoszyku</span>
+                                }
+                            </a>
+                        </li>
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
                             <span class="navbar-text text-white px-2 py-1">
