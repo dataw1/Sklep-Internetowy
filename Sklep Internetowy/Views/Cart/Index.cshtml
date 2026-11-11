@@ -41,10 +41,10 @@
                             <td class="fw-bold">@item.Nazwa</td>
                             <td>@item.Cena.ToString("C")</td>
                             <td>
-                                <!-- Zmieniono na formularz umożliwiający edycję ilości w koszyku -->
+
                                 <form asp-controller="Cart" asp-action="AddToCart" method="post" class="d-flex align-items-center m-0">
                                     <input type="hidden" name="id" value="@item.IdProdukt" />
-                                    <!-- Ponieważ metoda AddToCart będzie nadpisywać lub dodawać, wysyłamy różnicę lub używamy dedykowanej metody -->
+
                                     <span class="badge bg-light text-dark border px-3 py-2 me-2 fs-6">@item.Ilosc szt.</span>
                                 </form>
                             </td>
