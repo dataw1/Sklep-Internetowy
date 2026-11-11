@@ -88,6 +88,90 @@ namespace Sklep_Internetowy.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            if (User.Identity == null || !User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var userEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity.Name;
+            var klient = await _context.Klienci.FirstOrDefaultAsync(k => k.Email == userEmail);
+
+            if (klient == null)
+            {
+                var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (int.TryParse(idClaim, out int parsedId))
+                {
+                    klient = await _context.Klienci.FirstOrDefaultAsync(k => k.IdUzytkownik == parsedId);
+                }
+            }
+
+            if (klient == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var model = new ProfilViewModel
+            {
+                Email = klient.Email,
+                Imie = klient.Imie,
+                Nazwisko = klient.Nazwisko,
+                Telefon = klient.Telefon,
+                Ulica = klient.Ulica,
+                NumerDomu = klient.NumerDomu,
+                KodPocztowy = klient.KodPocztowy,
+                Miasto = klient.Miasto
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Profile(ProfilViewModel model)
+        {
+            if (User.Identity == null || !User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var userEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity.Name;
+            var klient = await _context.Klienci.FirstOrDefaultAsync(k => k.Email == userEmail);
+
+            if (klient == null)
+            {
+                var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (int.TryParse(idClaim, out int parsedId))
+                {
+                    klient = await _context.Klienci.FirstOrDefaultAsync(k => k.IdUzytkownik == parsedId);
+                }
+            }
+
+            if (klient == null)
+            {
+                return NotFound();
+            }
+
+            klient.Imie = model.Imie;
+            klient.Nazwisko = model.Nazwisko;
+            klient.Telefon = model.Telefon;
+            klient.Ulica = model.Ulica;
+            klient.NumerDomu = model.NumerDomu;
+            klient.KodPocztowy = model.KodPocztowy;
+            klient.Miasto = model.Miasto;
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Dane profilu zostały pomyślnie zaktualizowane!";
+            return View(model);
+        }
 
         public async Task<IActionResult> Logout()
         {
