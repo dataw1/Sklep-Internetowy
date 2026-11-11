@@ -3,13 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using Sklep_Internetowy.Data;
 using Sklep_Internetowy.Extensions;
 using Sklep_Internetowy.Models;
+using System.Security.Claims;
 
 namespace Sklep_Internetowy.Controllers
 {
     public class CartController : Controller
     {
         private readonly AppDbContext _context;
-        // Zmieniony klucz, aby wszêdzie by³ taki sam ("Cart")
         private const string CartSessionKey = "Cart";
 
         public CartController(AppDbContext context)
@@ -34,7 +34,7 @@ namespace Sklep_Internetowy.Controllers
             return View(cart);
         }
 
-        [HttpPost] // Zmienione na HttpPost, bo u¿ywamy <form method="post">
+        [HttpPost]
         public async Task<IActionResult> AddToCart(int id, int ilosc = 1)
         {
             var produkt = await _context.Produkty.FindAsync(id);
@@ -48,9 +48,7 @@ namespace Sklep_Internetowy.Controllers
                 ilosc = 1;
             }
 
-            // U¿ywamy ujednoliconej metody GetCart
             var cart = GetCart();
-
             var existingItem = cart.FirstOrDefault(c => c.IdProdukt == id);
             int obecnaIloscWKoszyku = existingItem != null ? existingItem.Ilosc : 0;
 
@@ -75,7 +73,6 @@ namespace Sklep_Internetowy.Controllers
                     });
                 }
 
-                // U¿ywamy ujednoliconej metody SaveCart
                 SaveCart(cart);
                 TempData["Success"] = $"Dodano {produkt.Nazwa} do koszyka!";
             }
@@ -115,13 +112,30 @@ namespace Sklep_Internetowy.Controllers
                 return RedirectToAction("Register", "Account");
             }
 
+            var userEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity.Name;
+            var klient = await _context.Klienci.FirstOrDefaultAsync(k => k.Email == userEmail);
+
+            if (klient == null)
+            {
+                var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (int.TryParse(userIdClaim, out int parsedId))
+                {
+                    klient = await _context.Klienci.FirstOrDefaultAsync(k => k.IdUzytkownik == parsedId);
+                }
+            }
+
+            if (klient == null)
+            {
+                TempData["Error"] = "Nie znaleziono profilu klienta dla Twojego konta.";
+                return RedirectToAction("Index");
+            }
+
             foreach (var item in cart)
             {
                 var produktWBazie = await _context.Produkty.FindAsync(item.IdProdukt);
                 if (produktWBazie != null)
                 {
                     produktWBazie.IloscWMagazynie -= item.Ilosc;
-
                     if (produktWBazie.IloscWMagazynie < 0)
                     {
                         produktWBazie.IloscWMagazynie = 0;
@@ -129,16 +143,28 @@ namespace Sklep_Internetowy.Controllers
                 }
             }
 
-            await _context.SaveChangesAsync();
-
             decimal total = cart.Sum(x => x.Suma);
             int itemCount = cart.Sum(x => x.Ilosc);
 
-            string orderNumber = $"ORD-{DateTime.Now:yyyyMMdd}-{Random.Shared.Next(1000, 9999)}";
+            var noweZamowienie = new Zamowienie
+            {
+                DataZlozenia = DateTime.UtcNow,
+                Status = StatusZamowienia.OCZEKUJACE,
+                LacznyKoszt = total,
+                MetodaPlatnosci = "Przelew online",
+                MetodaDostawy = "Kurier Standard",
+                KlientId = klient.IdUzytkownik,
+                AdresDostawyUlica = klient.Ulica ?? "Brak",
+                AdresDostawyKod = klient.KodPocztowy ?? "00-000",
+                AdresDostawyMiasto = klient.Miasto ?? "Nie podano"
+            };
+
+            _context.Zamowienia.Add(noweZamowienie);
+            await _context.SaveChangesAsync();
 
             HttpContext.Session.Remove(CartSessionKey);
 
-            TempData["OrderNumber"] = orderNumber;
+            TempData["OrderNumber"] = $"ORD-{DateTime.Now:yyyyMMdd}-{noweZamowienie.IdZamowienia:D4}";
             TempData["OrderTotal"] = total.ToString("C");
             TempData["OrderItemCount"] = itemCount;
 
