@@ -35,5 +35,7 @@ namespace Sklep_Internetowy.Models
         [Required(ErrorMessage = "Miejscowość jest wymagana")]
         [Display(Name = "Miasto")]
         public string Miasto { get; set; } = string.Empty;
+
+        public List<Zamowienie> HistoriaZamowien { get; set; } = new List<Zamowienie>();
     }
 }

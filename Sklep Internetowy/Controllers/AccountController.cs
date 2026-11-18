@@ -73,15 +73,23 @@ namespace Sklep_Internetowy.Controllers
                 return View(model);
             }
 
+            var zablokowanyKlient = await _context.Klienci.FirstOrDefaultAsync(k => k.IdUzytkownik == user.IdUzytkownik);
+
+            if (zablokowanyKlient != null && zablokowanyKlient.CzyAktywny == false)
+            {
+                ModelState.AddModelError("", "Konto zostało zablokowane przez administratora.");
+                return View(model);
+            }
+
             string rola = user is Administrator ? "Administrator" : "Klient";
 
             var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.IdUzytkownik.ToString()),
-                new Claim(ClaimTypes.Name, $"{user.Imie} {user.Nazwisko}"),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, rola)
-            };
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.IdUzytkownik.ToString()),
+        new Claim(ClaimTypes.Name, $"{user.Imie} {user.Nazwisko}"),
+        new Claim(ClaimTypes.Email, user.Email),
+        new Claim(ClaimTypes.Role, rola)
+    };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
@@ -130,6 +138,11 @@ namespace Sklep_Internetowy.Controllers
                 model.KodPocztowy = k.KodPocztowy;
                 model.Miasto = k.Miasto;
             }
+
+            model.HistoriaZamowien = await _context.Zamowienia
+                .Where(z => z.KlientId == uzytkownik.IdUzytkownik)
+                .OrderByDescending(z => z.DataZlozenia)
+                .ToListAsync();
 
             return View(model);
         }
@@ -182,6 +195,38 @@ namespace Sklep_Internetowy.Controllers
 
             TempData["Success"] = "Dane profilu zostały pomyślnie zaktualizowane!";
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AnulujZamowienie(int idZamowienia)
+        {
+            if (User.Identity == null || !User.Identity.IsAuthenticated)
+                return RedirectToAction("Login");
+
+            var userEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity.Name;
+            var uzytkownik = await _context.Uzytkownicy.FirstOrDefaultAsync(u => u.Email == userEmail);
+
+            if (uzytkownik == null) return NotFound();
+
+            var zamowienie = await _context.Zamowienia
+                .FirstOrDefaultAsync(z => z.IdZamowienia == idZamowienia && z.KlientId == uzytkownik.IdUzytkownik);
+
+            if (zamowienie != null)
+            {
+                if (zamowienie.Status == StatusZamowienia.OCZEKUJACE || zamowienie.Status == StatusZamowienia.OPLACONE)
+                {
+                    zamowienie.Status = StatusZamowienia.ANULOWANE;
+                    await _context.SaveChangesAsync();
+                    TempData["Success"] = $"Zamówienie #{idZamowienia} zostało pomyślnie anulowane.";
+                }
+                else
+                {
+                    TempData["Error"] = "Tego zamówienia nie można już anulować.";
+                }
+            }
+
+            return RedirectToAction("Profile");
         }
 
         public async Task<IActionResult> Logout()

@@ -79,7 +79,78 @@
                                 </div>
                             </div>
                         }
+                        @if (!User.IsInRole("Administrator"))
+                        {
+                            <h5 class="mt-5 mb-3 border-bottom pb-2"><i class="bi bi-clock-history me-2"></i>Historia moich zamówień</h5>
 
+                            @if (TempData["Error"] != null)
+                            {
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    @TempData["Error"]
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            }
+
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Nr</th>
+                                            <th>Data</th>
+                                            <th>Kwota</th>
+                                            <th>Status</th>
+                                            <th class="text-end">Akcja</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (!Model.HistoriaZamowien.Any())
+                                        {
+                                            <tr>
+                                                <td colspan="5" class="text-center py-3 text-muted">Nie złożyłeś jeszcze żadnego zamówienia.</td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            foreach (var zamowienie in Model.HistoriaZamowien)
+                                            {
+                                                <tr>
+                                                    <td class="fw-bold">#@zamowienie.IdZamowienia</td>
+                                                    <td>@zamowienie.DataZlozenia.ToString("dd.MM.yyyy HH:mm")</td>
+                                                    <td>@zamowienie.LacznyKoszt.ToString("0.00") zł</td>
+                                                    <td>
+                                                        @{
+                                                            var badgeClass = zamowienie.Status switch
+                                                            {
+                                                                Sklep_Internetowy.Models.StatusZamowienia.OCZEKUJACE => "bg-warning text-dark",
+                                                                Sklep_Internetowy.Models.StatusZamowienia.OPLACONE => "bg-info text-dark",
+                                                                Sklep_Internetowy.Models.StatusZamowienia.WYSYLANE => "bg-primary",
+                                                                Sklep_Internetowy.Models.StatusZamowienia.ZREALIZOWANE => "bg-success",
+                                                                Sklep_Internetowy.Models.StatusZamowienia.ANULOWANE => "bg-danger",
+                                                                _ => "bg-secondary"
+                                                            };
+                                                        }
+                                                        <span class="badge @badgeClass">@zamowienie.Status</span>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        @if (zamowienie.Status == Sklep_Internetowy.Models.StatusZamowienia.OCZEKUJACE || zamowienie.Status == Sklep_Internetowy.Models.StatusZamowienia.OPLACONE)
+                                                        {
+                                                            <form asp-action="AnulujZamowienie" method="post" class="d-inline" onsubmit="return confirm('Czy na pewno chcesz anulować to zamówienie?');">
+                                                                <input type="hidden" name="idZamowienia" value="@zamowienie.IdZamowienia" />
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger">Anuluj</button>
+                                                            </form>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted small">Brak akcji</span>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
                         <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
                             <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
                                 &larr; Powrót do sklepu
