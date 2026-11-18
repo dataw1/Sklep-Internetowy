@@ -27,9 +27,9 @@
                         <th>ID</th>
                         <th>Nazwa</th>
                         <th>Opis</th>
-                        <th>Cena Netto</th>
-                        <th>VAT</th>
-                        <th>Cena Brutto</th>
+                        <th>Cena Brutto (Dla klienta)</th>
+                        <th>Wartość VAT</th>
+                        <th>Cena Netto (Zysk)</th>
                         <th>Stan mag.</th>
                         <th>Status</th>
                         <th class="text-end">Akcje</th>
@@ -44,13 +44,18 @@
                     }
                     @foreach (var item in Model)
                     {
+                        decimal cenaBrutto = item.Cena;
+                        decimal dzielnikVat = 1 + (item.StawkaVat / 100m);
+                        decimal cenaNetto = cenaBrutto / dzielnikVat;
+                        decimal kwotaVat = cenaBrutto - cenaNetto;
+
                         <tr>
                             <td>#@item.IdProdukt</td>
                             <td class="fw-bold">@item.Nazwa</td>
                             <td class="text-truncate" style="max-width: 220px;">@item.Opis</td>
-                            <td>@item.Cena.ToString("0.00") zł</td>
-                            <td>@item.StawkaVat%</td>
-                            <td class="fw-semibold text-primary">@item.PobierzCeneBrutto().ToString("0.00") zł</td>
+                            <td class="fw-semibold text-primary">@cenaBrutto.ToString("0.00") zł</td>
+                            <td class="text-danger small">@kwotaVat.ToString("0.00") zł <br /> <span class="text-muted">(@item.StawkaVat%)</span></td>
+                            <td class="fw-bold text-success">@cenaNetto.ToString("0.00") zł</td>
                             <td>
                                 @if (item.IloscWMagazynie > 0)
                                 {
@@ -81,7 +86,6 @@
                                     Usuń
                                 </button>
 
-                                <!-- Modal potwierdzający usunięcie -->
                                 <div class="modal fade text-start" id="deleteModal-@item.IdProdukt" tabindex="-1" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">

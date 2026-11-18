@@ -88,6 +88,7 @@ namespace Sklep_Internetowy.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+
         [HttpGet]
         public async Task<IActionResult> Profile()
         {
@@ -97,33 +98,38 @@ namespace Sklep_Internetowy.Controllers
             }
 
             var userEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity.Name;
-            var klient = await _context.Klienci.FirstOrDefaultAsync(k => k.Email == userEmail);
 
-            if (klient == null)
+            var uzytkownik = await _context.Uzytkownicy.FirstOrDefaultAsync(k => k.Email == userEmail);
+
+            if (uzytkownik == null)
             {
                 var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (int.TryParse(idClaim, out int parsedId))
                 {
-                    klient = await _context.Klienci.FirstOrDefaultAsync(k => k.IdUzytkownik == parsedId);
+                    uzytkownik = await _context.Uzytkownicy.FirstOrDefaultAsync(k => k.IdUzytkownik == parsedId);
                 }
             }
 
-            if (klient == null)
+            if (uzytkownik == null)
             {
                 return RedirectToAction("Login", "Account");
             }
 
             var model = new ProfilViewModel
             {
-                Email = klient.Email,
-                Imie = klient.Imie,
-                Nazwisko = klient.Nazwisko,
-                Telefon = klient.Telefon,
-                Ulica = klient.Ulica,
-                NumerDomu = klient.NumerDomu,
-                KodPocztowy = klient.KodPocztowy,
-                Miasto = klient.Miasto
+                Email = uzytkownik.Email,
+                Imie = uzytkownik.Imie,
+                Nazwisko = uzytkownik.Nazwisko
             };
+
+            if (uzytkownik is Klient k)
+            {
+                model.Telefon = k.Telefon;
+                model.Ulica = k.Ulica;
+                model.NumerDomu = k.NumerDomu;
+                model.KodPocztowy = k.KodPocztowy;
+                model.Miasto = k.Miasto;
+            }
 
             return View(model);
         }
@@ -143,29 +149,34 @@ namespace Sklep_Internetowy.Controllers
             }
 
             var userEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.Identity.Name;
-            var klient = await _context.Klienci.FirstOrDefaultAsync(k => k.Email == userEmail);
 
-            if (klient == null)
+            var uzytkownik = await _context.Uzytkownicy.FirstOrDefaultAsync(k => k.Email == userEmail);
+
+            if (uzytkownik == null)
             {
                 var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (int.TryParse(idClaim, out int parsedId))
                 {
-                    klient = await _context.Klienci.FirstOrDefaultAsync(k => k.IdUzytkownik == parsedId);
+                    uzytkownik = await _context.Uzytkownicy.FirstOrDefaultAsync(k => k.IdUzytkownik == parsedId);
                 }
             }
 
-            if (klient == null)
+            if (uzytkownik == null)
             {
                 return NotFound();
             }
 
-            klient.Imie = model.Imie;
-            klient.Nazwisko = model.Nazwisko;
-            klient.Telefon = model.Telefon;
-            klient.Ulica = model.Ulica;
-            klient.NumerDomu = model.NumerDomu;
-            klient.KodPocztowy = model.KodPocztowy;
-            klient.Miasto = model.Miasto;
+            uzytkownik.Imie = model.Imie;
+            uzytkownik.Nazwisko = model.Nazwisko;
+
+            if (uzytkownik is Klient k)
+            {
+                k.Telefon = model.Telefon;
+                k.Ulica = model.Ulica;
+                k.NumerDomu = model.NumerDomu;
+                k.KodPocztowy = model.KodPocztowy;
+                k.Miasto = model.Miasto;
+            }
 
             await _context.SaveChangesAsync();
 
